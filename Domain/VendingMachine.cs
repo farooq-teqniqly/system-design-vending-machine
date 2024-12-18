@@ -1,26 +1,20 @@
-namespace Domain;
+using Domain.Inventory;
+using Domain.States;
 
+namespace Domain;
 public sealed class VendingMachine
 {
-    public IState CurrentState { get; private set; }
+    public event EventHandler<VendingMachineEventArgs>? OnMessageRaised;
 
-    public VendingMachine(ButtonToProductMapping mapping)
+    public IState CurrentState { get; set; }
+
+    public VendingMachine(IInventoryManager inventoryManager)
     {
-        CurrentState = new IdleState(this, mapping);
+        CurrentState = new IdleState(this, inventoryManager);
     }
 
-    public void PressStartButton()
+    public void RaiseEvent(VendingMachineEventArgs args)
     {
-        CurrentState.PressStartButton();
-    }
-
-    public void PressItemSelectionButton(string buttonId)
-    {
-        CurrentState.PressItemSelectionButton(buttonId);
-    }
-
-    public void SetState(IState newState)
-    {
-        CurrentState = newState;
+        OnMessageRaised?.Invoke(this, args);
     }
 }
