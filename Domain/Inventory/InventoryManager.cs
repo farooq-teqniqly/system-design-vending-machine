@@ -23,6 +23,8 @@ public sealed class InventoryManager : IInventoryManager
 
     public Item GetItem(string itemId)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(itemId);
+
         if (!_items.TryGetValue(itemId, out var item))
         {
             return new InvalidItem();
@@ -33,6 +35,8 @@ public sealed class InventoryManager : IInventoryManager
 
     public void AddItems(IEnumerable<Item> items)
     {
+        ArgumentNullException.ThrowIfNull(items);
+
         foreach (var item in items)
         {
             _items.Add(item.ItemId, item);
@@ -41,6 +45,8 @@ public sealed class InventoryManager : IInventoryManager
 
     public void ItemSold(string itemId)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(itemId);
+
         var item = _items[itemId];
 
         _items.Remove(itemId);
