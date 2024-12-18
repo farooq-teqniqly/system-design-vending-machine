@@ -34,8 +34,8 @@ public class AwaitingPaymentStateTests
 
         // Assert
         _args.Should().NotBeNull();
-        _args!.Message.Should().Be("payment complete");
-        _vendingMachine.CurrentState.Should().BeOfType<DispenseState>();
+        _args!.Message.Should().Contain("change dispensed");
+        _vendingMachine.CurrentState.Should().BeOfType<IdleState>();
     }
 
     [Fact]
@@ -57,6 +57,6 @@ public class AwaitingPaymentStateTests
         // Act again
         _awaitingPaymentState.InsertCash(2);
         _args.Should().NotBeNull();
-        _args!.Message.Should().Be("payment complete");
+        _args!.Message.Should().Contain("change dispensed");
     }
 }

@@ -48,11 +48,6 @@ public sealed class VendingMachine
         CurrentState.InsertCash(amount);
     }
 
-    public void RaiseEvent(VendingMachineEventArgs args)
-    {
-        OnMessageRaised?.Invoke(this, args);
-    }
-
     public void DispenseItem()
     {
         OnMessageRaised?.Invoke(this, new VendingMachineEventArgs($"item dispensed: {SelectedItem}"));
@@ -87,4 +82,10 @@ public sealed class VendingMachine
     {
         CurrentState.CancelTransaction();
     }
+
+    public void RaiseEvent(VendingMachineEventArgs args)
+    {
+        OnMessageRaised?.Invoke(this, args);
+    }
+
 }
