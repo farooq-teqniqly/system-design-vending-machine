@@ -7,7 +7,7 @@ namespace Domain.Tests;
 public class VendingMachineTests
 {
     private readonly InventoryManager _inventoryManager = new(new InventoryManagerConfiguration(1));
-    private readonly MoneyManager _moneyManager = new(new MoneyManagerConfiguration(new[] {1}));
+    private readonly MoneyManager _moneyManager = new(new MoneyManagerConfiguration(new[] { 1 }));
     private readonly VendingMachine _vendingMachine;
 
     public VendingMachineTests()
@@ -270,7 +270,7 @@ public class VendingMachineTests
 
         var a1Notifications = lowInventoryItemEventArgs.Where(a => a.Item.ItemId == "A1");
 
-        a1Notifications.All(a => a.Item.Quantity == 1).Should().BeTrue();
+        a1Notifications.Should().OnlyContain(a => a.Item.Quantity == 1);
 
         lowInventoryItemEventArgs.Single(a => a.Item.ItemId == "A2").Item.Quantity.Should().Be(1);
 
@@ -310,7 +310,7 @@ public class VendingMachineTests
         var item1 = new Item("A1", "Chips", 2.49m, 3);
         var item2 = new Item("A2", "Cookies", 0.99m, 2);
 
-        _inventoryManager.AddItems(new[] {item1, item2});
+        _inventoryManager.AddItems(new[] { item1, item2 });
 
         var eventArgsList = new List<VendingMachineEventArgs>();
         _vendingMachine.OnMessageRaised += (_, args) => eventArgsList.Add(args);

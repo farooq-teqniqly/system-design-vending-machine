@@ -24,7 +24,7 @@ public class Program
         var inventoryManager = new InventoryManager(new InventoryManagerConfiguration());
         inventoryManager.AddItems(items);
 
-        var moneyManager = new MoneyManager(new MoneyManagerConfiguration(new[] {1}));
+        var moneyManager = new MoneyManager(new MoneyManagerConfiguration(new[] { 1 }));
 
         var vendingMachine = new VendingMachine(inventoryManager, moneyManager);
         vendingMachine.OnMessageRaised += (_, args) =>
@@ -35,11 +35,11 @@ public class Program
         };
 
         DisplayCommands();
-        
+
         while (true)
         {
             DisplayAvailableItems(inventoryManager.GetAvailableItems());
-            
+
             Console.WriteLine("enter command: ");
             var input = Console.ReadLine()?.Trim();
 

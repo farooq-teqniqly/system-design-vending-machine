@@ -27,7 +27,7 @@ public class Change
     /// A dime is a coin worth 10 cents. This property represents the count of dimes
     /// dispensed as part of the change.
     /// </remarks>
-    public int Dimes { get;}
+    public int Dimes { get; }
     /// <summary>
     /// Gets the number of nickels in the change.
     /// </summary>
