@@ -24,7 +24,7 @@ public class Program
         var inventoryManager = new InventoryManager(new InventoryManagerConfiguration());
         inventoryManager.AddItems(items);
 
-        var moneyManager = new MoneyManager();
+        var moneyManager = new MoneyManager(new MoneyManagerConfiguration(new[] {1}));
 
         var vendingMachine = new VendingMachine(inventoryManager, moneyManager);
         vendingMachine.OnMessageRaised += (_, args) =>

@@ -10,7 +10,27 @@ namespace Domain.Money;
 /// </remarks>
 public sealed class MoneyManager : IMoneyManager
 {
-    private static readonly int[] _validBillDenominations = new[] { 1, 5, 10, 20 };
+    private readonly MoneyManagerConfiguration _configuration;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MoneyManager"/> class with the specified configuration.
+    /// </summary>
+    /// <param name="configuration">
+    /// The configuration object that defines valid bill denominations and other monetary settings.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when the <paramref name="configuration"/> is <see langword="null"/>.
+    /// </exception>
+    /// <remarks>
+    /// This constructor ensures that the <see cref="MoneyManager"/> is properly configured to handle
+    /// monetary operations, such as validating bill denominations and calculating change.
+    /// </remarks>
+    public MoneyManager(MoneyManagerConfiguration configuration)
+    {
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        _configuration = configuration;
+    }
 
     /// <summary>
     /// Determines whether the specified amount corresponds to a valid bill denomination.
@@ -23,7 +43,7 @@ public sealed class MoneyManager : IMoneyManager
     /// This method checks if the provided amount matches one of the predefined valid bill denominations
     /// within the vending machine system. It ensures that only acceptable denominations are processed.
     /// </remarks>
-    public bool IsValidBillDenomination(int amount) => _validBillDenominations.Contains(amount);
+    public bool IsValidBillDenomination(int amount) => _configuration.ValidBillDenominations.Contains(amount);
 
     /// <summary>
     /// Calculates the change for a specified amount in cents.

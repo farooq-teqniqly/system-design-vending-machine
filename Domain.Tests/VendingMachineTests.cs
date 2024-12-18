@@ -7,7 +7,7 @@ namespace Domain.Tests;
 public class VendingMachineTests
 {
     private readonly InventoryManager _inventoryManager = new(new InventoryManagerConfiguration(1));
-    private readonly MoneyManager _moneyManager = new();
+    private readonly MoneyManager _moneyManager = new(new MoneyManagerConfiguration(new[] {1}));
     private readonly VendingMachine _vendingMachine;
 
     public VendingMachineTests()
@@ -163,8 +163,13 @@ public class VendingMachineTests
         transactionCancelledEventArgs.Should().NotBeNull();
     }
 
-    [Fact]
-    public void Invalid_Bill_Denominations_Are_Rejected()
+    [Theory]
+    [InlineData(5)]
+    [InlineData(10)]
+    [InlineData(20)]
+    [InlineData(50)]
+    [InlineData(100)]
+    public void Invalid_Bill_Denominations_Are_Rejected(int denomination)
     {
         // Arrange
         var item = new Item("A1", "Chips", 2.49m, 2);
@@ -175,13 +180,13 @@ public class VendingMachineTests
 
         // Act
         _vendingMachine.SelectItem(item.ItemId);
-        _vendingMachine.InsertCash(50);
+        _vendingMachine.InsertCash(denomination);
 
         // Assert
         var billRejectedEventArgs = eventArgsList.Single(a => a.GetType() == typeof(BillRejectedEventArgs))
             .As<BillRejectedEventArgs>();
 
-        billRejectedEventArgs.Denomination.Should().Be(50);
+        billRejectedEventArgs.Denomination.Should().Be(denomination);
     }
 
     [Fact]
@@ -216,10 +221,12 @@ public class VendingMachineTests
 
         // Act
         _vendingMachine.SelectItem("A1");
-        _vendingMachine.InsertCash(5);
+        _vendingMachine.InsertCash(1);
+        _vendingMachine.InsertCash(1);
+        _vendingMachine.InsertCash(1);
 
         _vendingMachine.SelectItem("A1");
-        _vendingMachine.InsertCash(5);
+        _vendingMachine.InsertCash(1);
 
         // Assert
         var outOfStockItemEventArgs = eventArgsList.First(a => a.GetType() == typeof(OutOfStockItemEventArgs))
@@ -246,10 +253,13 @@ public class VendingMachineTests
 
         // Act
         _vendingMachine.SelectItem("A1");
-        _vendingMachine.InsertCash(5);
+        _vendingMachine.InsertCash(1);
+        _vendingMachine.InsertCash(1);
+        _vendingMachine.InsertCash(1);
 
         _vendingMachine.SelectItem("A2");
-        _vendingMachine.InsertCash(5);
+        _vendingMachine.InsertCash(1);
+        _vendingMachine.InsertCash(1);
 
         // Assert
         var lowInventoryItemEventArgs = eventArgsList.Where(a => a.GetType() == typeof(LowInventoryItemEventArgs))
@@ -280,7 +290,9 @@ public class VendingMachineTests
 
         // Act
         _vendingMachine.SelectItem("A1");
-        _vendingMachine.InsertCash(5);
+        _vendingMachine.InsertCash(1);
+        _vendingMachine.InsertCash(1);
+        _vendingMachine.InsertCash(1);
 
         // Assert
         var outOfStockItemEventArgs = eventArgsList.Single(a => a.GetType() == typeof(OutOfStockItemEventArgs))
@@ -306,7 +318,9 @@ public class VendingMachineTests
         // Act
         _vendingMachine.SelectItem("A1");
         _vendingMachine.SelectItem("A2");
-        _vendingMachine.InsertCash(5);
+        _vendingMachine.InsertCash(1);
+        _vendingMachine.InsertCash(1);
+        _vendingMachine.InsertCash(1);
 
         var itemDispensedEventArgs = eventArgsList.Single(a => a.GetType() == typeof(ItemDispensedEventArgs))
             .As<ItemDispensedEventArgs>();
@@ -331,7 +345,7 @@ public class VendingMachineTests
         _vendingMachine.SelectItem("A1");
         _vendingMachine.CancelTransaction();
         _vendingMachine.SelectItem("A2");
-        _vendingMachine.InsertCash(5);
+        _vendingMachine.InsertCash(1);
 
         var itemDispensedEventArgs = eventArgsList.Single(a => a.GetType() == typeof(ItemDispensedEventArgs))
             .As<ItemDispensedEventArgs>();
@@ -345,7 +359,7 @@ public class VendingMachineTests
         var eventArgsList = new List<VendingMachineEventArgs>();
         _vendingMachine.OnMessageRaised += (_, args) => eventArgsList.Add(args);
 
-        _vendingMachine.InsertCash(5);
+        _vendingMachine.InsertCash(1);
 
         var vendingMachineEventArgs = eventArgsList.Single(a => a.GetType() == typeof(VendingMachineEventArgs))
             .As<VendingMachineEventArgs>();

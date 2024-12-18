@@ -3,7 +3,34 @@
 ## PlantUML Diagrams
 
 [Online Editor](https://www.planttext.com/)
+
 [State Machine Diagrams](https://www.baeldung.com/cs/uml-state-diagrams)
+
+## System Architecture Diagram
+
+```plantuml
+@startuml
+left to right direction
+
+package "Vending Machine System" {
+    rectangle "User Interface" as UI
+    rectangle "State Manager" as StateManager
+    rectangle "Inventory Manager" as InventoryManager
+    rectangle "Money Manager" as MoneyManager
+    rectangle "Domain Events" as DomainEvents
+
+    UI --> StateManager : "User actions"
+    StateManager --> InventoryManager : "Manage inventory"
+    StateManager --> MoneyManager : "Handle payment"
+    DomainEvents --> InventoryManager : "Inventory alerts"
+    StateManager --> DomainEvents : "Raise events"
+}
+
+actor User
+User --> UI : "Interact with system"
+
+@enduml
+```
 
 ## State Diagram
 
@@ -26,6 +53,7 @@ AwaitingPaymentState --> AwaitingPaymentState : InsertCash(amount < itemPrice)
 ```
 
 ## Class Diagram
+
 ```plantuml
 @startuml
 
@@ -111,8 +139,8 @@ class NoChange extends Change
 
 ```
 
-
 ## Events
+
 ```plantuml
 @startuml
 
@@ -140,10 +168,10 @@ class TransactionCancelledEventArgs extends VendingMachineEventArgs
 
 ```
 
-
 ## Activity Diagrams for Vending Machine
 
 ### SelectItem
+
 ```plantuml
 @startuml
 actor User
@@ -176,6 +204,7 @@ VendingMachine -> CurrentState: SelectItem(SelectedItem)
 ```
 
 ### Insert Cash
+
 ```plantuml
 @startuml
 actor User
@@ -201,6 +230,7 @@ end
 ```
 
 ## Refund
+
 ```plantuml
 @startuml
 actor User
@@ -227,6 +257,7 @@ end
 ### IdleState
 
 #### SelectItem
+
 ```plantuml
 @startuml
 actor User
@@ -243,6 +274,7 @@ VendingMachine -> VendingMachine: CurrentState = new AwaitingPaymentState()
 ```
 
 #### CancelTransaction
+
 ```plantuml
 @startuml
 actor User
@@ -258,6 +290,7 @@ IdleState -> VendingMachine: CurrentState = new IdleState()
 ### AwaitingPaymentState
 
 #### InsertCash
+
 ```plantuml
 @startuml
 actor User
@@ -283,6 +316,7 @@ end
 ```
 
 #### CancelTransaction
+
 ```plantuml
 @startuml
 actor User
@@ -305,10 +339,10 @@ The vending machine system is designed to allow users to purchase items by selec
 
 ## 2. **Objectives**
 
-- Enable seamless user interaction for purchasing items.
-- Maintain accurate inventory management.
-- Ensure proper handling of cash transactions, including refunds and dispensing change.
-- Provide clear feedback and error handling for user operations.
+-   Enable seamless user interaction for purchasing items.
+-   Maintain accurate inventory management.
+-   Ensure proper handling of cash transactions, including refunds and dispensing change.
+-   Provide clear feedback and error handling for user operations.
 
 ## 3. **System Architecture**
 
@@ -316,48 +350,48 @@ The vending machine system is designed to allow users to purchase items by selec
 
 #### 3.1.1 Vending Machine Core:
 
-- **Responsibilities:** Manages overall operations, current state, selected item, and event-driven messages.
-- **Key Methods:**
-  - `SelectItem(string itemId)`
-  - `InsertCash(int amount)`
-  - `DispenseItem()`
-  - `DispenseChange(int amount)`
-  - `Refund(int amount)`
-  - `CancelTransaction()`
+-   **Responsibilities:** Manages overall operations, current state, selected item, and event-driven messages.
+-   **Key Methods:**
+    -   `SelectItem(string itemId)`
+    -   `InsertCash(int amount)`
+    -   `DispenseItem()`
+    -   `DispenseChange(int amount)`
+    -   `Refund(int amount)`
+    -   `CancelTransaction()`
 
 #### 3.1.2 Inventory Management:
 
-- **Responsibilities:** Tracks and updates item availability in the vending machine.
-- **Interface:** `IInventoryManager`
-- **Core Methods:**
-  - `AddItem(Item item)`
-  - `GetAvailableItems()`
-  - `GetItem(string itemId)`
-  - `ItemSold(string itemId)`
+-   **Responsibilities:** Tracks and updates item availability in the vending machine.
+-   **Interface:** `IInventoryManager`
+-   **Core Methods:**
+    -   `AddItem(Item item)`
+    -   `GetAvailableItems()`
+    -   `GetItem(string itemId)`
+    -   `ItemSold(string itemId)`
 
 #### 3.1.3 Money Management:
 
-- **Responsibilities:** Validates cash denominations, calculates and dispenses change.
-- **Interface:** `IMoneyManager`
-- **Core Methods:**
-  - `IsValidBillDenomination(int amount)`
-  - `MakeChange(int amount)`
+-   **Responsibilities:** Validates cash denominations, calculates and dispenses change.
+-   **Interface:** `IMoneyManager`
+-   **Core Methods:**
+    -   `IsValidBillDenomination(int amount)`
+    -   `MakeChange(int amount)`
 
 #### 3.1.4 State Management:
 
-- Implements the **State Design Pattern**, defining behaviors for different states.
-- **States:**
-  - `IdleState`: The default state, awaiting user interaction.
-  - `AwaitingPaymentState`: Active when an item is selected and awaiting payment.
+-   Implements the **State Design Pattern**, defining behaviors for different states.
+-   **States:**
+    -   `IdleState`: The default state, awaiting user interaction.
+    -   `AwaitingPaymentState`: Active when an item is selected and awaiting payment.
 
 ### 3.2 Event-Driven Design:
 
 Events provide feedback and status updates during operations. Key event types include:
 
-- `ItemSelectedEventArgs`
-- `InvalidItemSelectedEventArgs`
-- `PaymentCompleteEventArgs`
-- `TransactionCancelledEventArgs`
+-   `ItemSelectedEventArgs`
+-   `InvalidItemSelectedEventArgs`
+-   `PaymentCompleteEventArgs`
+-   `TransactionCancelledEventArgs`
 
 ## 4. **UML Diagrams**
 
@@ -373,52 +407,52 @@ The State Diagram models the transitions between `IdleState` and `AwaitingPaymen
 
 Sequence Diagrams provide a detailed view of interactions for specific operations, including:
 
-- Selecting an item (`SelectItem` operation).
-- Inserting cash (`InsertCash` operation).
-- Refunding money (`Refund` operation).
+-   Selecting an item (`SelectItem` operation).
+-   Inserting cash (`InsertCash` operation).
+-   Refunding money (`Refund` operation).
 
 ## 5. **Core Features**
 
 ### 5.1 Item Selection
 
-- Users select an item by providing its ID.
-- Invalid or out-of-stock items trigger appropriate error events.
-- Once an item is selected, the system transitions to the `AwaitingPaymentState`.
+-   Users select an item by providing its ID.
+-   Invalid or out-of-stock items trigger appropriate error events.
+-   Once an item is selected, the system transitions to the `AwaitingPaymentState`.
 
 ### 5.2 Payment Handling
 
-- Users insert cash in valid denominations.
-- Total cash inserted is tracked.
-- If payment is sufficient, the system transitions to dispense the item and change.
+-   Users insert cash in valid denominations.
+-   Total cash inserted is tracked.
+-   If payment is sufficient, the system transitions to dispense the item and change.
 
 ### 5.3 Refund Mechanism
 
-- Users can cancel transactions at any time.
-- Refunds are calculated and dispensed based on the amount inserted.
+-   Users can cancel transactions at any time.
+-   Refunds are calculated and dispensed based on the amount inserted.
 
 ### 5.4 Inventory Management
 
-- Tracks available items and quantities.
-- Alerts for low inventory.
-- Updates inventory when items are sold.
+-   Tracks available items and quantities.
+-   Alerts for low inventory.
+-   Updates inventory when items are sold.
 
 ## 6. **Error Handling**
 
-- Invalid actions (e.g., selecting an invalid item, inserting invalid denominations) trigger descriptive error events.
-- Exceptions like `ArgumentException` and `ArgumentOutOfRangeException` ensure robustness.
+-   Invalid actions (e.g., selecting an invalid item, inserting invalid denominations) trigger descriptive error events.
+-   Exceptions like `ArgumentException` and `ArgumentOutOfRangeException` ensure robustness.
 
 ## 7. **Advanced Features (Future Enhancements)**
 
-- Support for digital payments.
-- Restocking notifications for operators.
-- Enhanced diagnostics for maintenance.
-- Multi-user handling for high-demand scenarios.
+-   Support for digital payments.
+-   Restocking notifications for operators.
+-   Enhanced diagnostics for maintenance.
+-   Multi-user handling for high-demand scenarios.
 
 ## 8. **Testing Strategy**
 
-- Unit tests for individual components (e.g., `InventoryManager`, `MoneyManager`).
-- Integration tests for state transitions and event handling.
-- Edge case tests for invalid inputs and concurrent operations.
+-   Unit tests for individual components (e.g., `InventoryManager`, `MoneyManager`).
+-   Integration tests for state transitions and event handling.
+-   Edge case tests for invalid inputs and concurrent operations.
 
 ## 9. **Conclusion**
 
@@ -441,85 +475,93 @@ This document provides the low-level design for the Vending Machine System, deta
 ### 2.1. VendingMachine
 
 #### **Attributes**
-- `IInventoryManager _inventoryManager`: Manages inventory operations.
-- `IMoneyManager _moneyManager`: Handles payment validation and change computation.
-- `Item SelectedItem`: Stores the currently selected item.
-- `IState CurrentState`: Tracks the current state of the vending machine.
-- `event OnMessageRaised`: Event triggered for various operations.
+
+-   `IInventoryManager _inventoryManager`: Manages inventory operations.
+-   `IMoneyManager _moneyManager`: Handles payment validation and change computation.
+-   `Item SelectedItem`: Stores the currently selected item.
+-   `IState CurrentState`: Tracks the current state of the vending machine.
+-   `event OnMessageRaised`: Event triggered for various operations.
 
 #### **Methods**
-- `SelectItem(string itemId)`:
-  - **Input**: `itemId` (ID of the item to select)
-  - **Logic**:
-    - Validate `itemId`.
-    - Check if `SelectedItem` is already set. If yes, raise `ItemAlreadySelectedEventArgs`.
-    - Retrieve the item from `_inventoryManager`.
-    - Handle `InvalidItem` or `OutOfStockItem`.
-    - Set `SelectedItem` and delegate to `CurrentState.SelectItem`.
-- `InsertCash(int amount)`:
-  - **Input**: `amount` (Cash inserted)
-  - **Logic**:
-    - Validate denomination using `_moneyManager`.
-    - Delegate to `CurrentState.InsertCash`.
-- `DispenseItem()`:
-  - **Logic**: Dispense the selected item and update inventory via `_inventoryManager`.
-- `DispenseChange(int amount)`:
-  - **Logic**: Use `_moneyManager` to compute change and notify the user via `ChangeDispensedEventArgs`.
-- `Refund(int amount)`:
-  - **Logic**:
-    - If `amount == 0`, notify using `NoChange`.
-    - Otherwise, compute change and notify using `ChangeDispensedEventArgs`.
-- `CancelTransaction()`:
-  - **Logic**:
-    - Refund any collected amount.
-    - Transition to `IdleState`.
+
+-   `SelectItem(string itemId)`:
+    -   **Input**: `itemId` (ID of the item to select)
+    -   **Logic**:
+        -   Validate `itemId`.
+        -   Check if `SelectedItem` is already set. If yes, raise `ItemAlreadySelectedEventArgs`.
+        -   Retrieve the item from `_inventoryManager`.
+        -   Handle `InvalidItem` or `OutOfStockItem`.
+        -   Set `SelectedItem` and delegate to `CurrentState.SelectItem`.
+-   `InsertCash(int amount)`:
+    -   **Input**: `amount` (Cash inserted)
+    -   **Logic**:
+        -   Validate denomination using `_moneyManager`.
+        -   Delegate to `CurrentState.InsertCash`.
+-   `DispenseItem()`:
+    -   **Logic**: Dispense the selected item and update inventory via `_inventoryManager`.
+-   `DispenseChange(int amount)`:
+    -   **Logic**: Use `_moneyManager` to compute change and notify the user via `ChangeDispensedEventArgs`.
+-   `Refund(int amount)`:
+    -   **Logic**:
+        -   If `amount == 0`, notify using `NoChange`.
+        -   Otherwise, compute change and notify using `ChangeDispensedEventArgs`.
+-   `CancelTransaction()`:
+    -   **Logic**:
+        -   Refund any collected amount.
+        -   Transition to `IdleState`.
 
 ---
 
 ### 2.2. Item
 
 #### **Attributes**
-- `string ItemId`: Unique identifier for the item.
-- `string Name`: Item name.
-- `decimal Price`: Item price.
-- `int Quantity`: Number of units available.
+
+-   `string ItemId`: Unique identifier for the item.
+-   `string Name`: Item name.
+-   `decimal Price`: Item price.
+-   `int Quantity`: Number of units available.
 
 #### **Derived Classes**
-- `InvalidItem`, `OutOfStockItem`: Special item states for error handling.
+
+-   `InvalidItem`, `OutOfStockItem`: Special item states for error handling.
 
 ---
 
 ### 2.3. InventoryManager (Implements `IInventoryManager`)
 
 #### **Attributes**
-- `Dictionary<string, Item> _items`: Maps item IDs to their corresponding `Item` objects.
-- `InventoryManagerConfiguration _config`: Configuration for low inventory thresholds.
+
+-   `Dictionary<string, Item> _items`: Maps item IDs to their corresponding `Item` objects.
+-   `InventoryManagerConfiguration _config`: Configuration for low inventory thresholds.
 
 #### **Methods**
-- `AddItem(Item item)`:
-  - Adds a single item to the inventory.
-- `GetAvailableItems()`:
-  - Returns a list of items with `Quantity > 0`.
-- `GetItem(string itemId)`:
-  - Retrieves the `Item` based on `itemId`. Returns `InvalidItem` or `OutOfStockItem` if applicable.
-- `ItemSold(string itemId)`:
-  - Decreases the quantity of the specified item.
-- `GetLowInventoryItems()`:
-  - Returns items with `Quantity < _config.LowInventoryThreshold`.
+
+-   `AddItem(Item item)`:
+    -   Adds a single item to the inventory.
+-   `GetAvailableItems()`:
+    -   Returns a list of items with `Quantity > 0`.
+-   `GetItem(string itemId)`:
+    -   Retrieves the `Item` based on `itemId`. Returns `InvalidItem` or `OutOfStockItem` if applicable.
+-   `ItemSold(string itemId)`:
+    -   Decreases the quantity of the specified item.
+-   `GetLowInventoryItems()`:
+    -   Returns items with `Quantity < _config.LowInventoryThreshold`.
 
 ---
 
 ### 2.4. MoneyManager (Implements `IMoneyManager`)
 
 #### **Attributes**
-- `HashSet<int> _validDenominations`: Contains valid cash denominations (e.g., `[1, 5, 10, 20]`).
-- `Dictionary<int, int> _changeInventory`: Tracks available coins for change computation.
+
+-   `HashSet<int> _validDenominations`: Contains valid cash denominations (e.g., `[1, 5, 10, 20]`).
+-   `Dictionary<int, int> _changeInventory`: Tracks available coins for change computation.
 
 #### **Methods**
-- `IsValidBillDenomination(int amount)`:
-  - Validates the cash denomination.
-- `MakeChange(int amount)`:
-  - Computes and dispenses change using `_changeInventory`.
+
+-   `IsValidBillDenomination(int amount)`:
+    -   Validates the cash denomination.
+-   `MakeChange(int amount)`:
+    -   Computes and dispenses change using `_changeInventory`.
 
 ---
 
@@ -527,37 +569,38 @@ This document provides the low-level design for the Vending Machine System, deta
 
 #### **IdleState**
 
-- **Methods**:
-  - `SelectItem(Item item)`:
-    - Validates the item and transitions to `AwaitingPaymentState`.
-  - `CancelTransaction()`:
-    - Resets the machine state.
+-   **Methods**:
+    -   `SelectItem(Item item)`:
+        -   Validates the item and transitions to `AwaitingPaymentState`.
+    -   `CancelTransaction()`:
+        -   Resets the machine state.
 
 #### **AwaitingPaymentState**
 
-- **Attributes**:
-  - `int _totalInsertedAmount`: Tracks the total payment received.
+-   **Attributes**:
 
-- **Methods**:
-  - `InsertCash(int amount)`:
-    - Updates `_totalInsertedAmount`.
-    - Triggers `InsertMoreMoneyEventArgs` if more payment is required.
-    - If sufficient, computes change, dispenses the item, and transitions to `IdleState`.
-  - `CancelTransaction()`:
-    - Refunds the collected amount and transitions to `IdleState`.
+    -   `int _totalInsertedAmount`: Tracks the total payment received.
+
+-   **Methods**:
+    -   `InsertCash(int amount)`:
+        -   Updates `_totalInsertedAmount`.
+        -   Triggers `InsertMoreMoneyEventArgs` if more payment is required.
+        -   If sufficient, computes change, dispenses the item, and transitions to `IdleState`.
+    -   `CancelTransaction()`:
+        -   Refunds the collected amount and transitions to `IdleState`.
 
 ---
 
 ### 2.6. Events
 
-- **Base Class**: `VendingMachineEventArgs`
-- **Derived Events**:
-  - `BillAcceptedEventArgs`
-  - `BillRejectedEventArgs`
-  - `ItemSelectedEventArgs`
-  - `OutOfStockItemEventArgs`
-  - `PaymentCompleteEventArgs`
-  - `TransactionCancelledEventArgs`
+-   **Base Class**: `VendingMachineEventArgs`
+-   **Derived Events**:
+    -   `BillAcceptedEventArgs`
+    -   `BillRejectedEventArgs`
+    -   `ItemSelectedEventArgs`
+    -   `OutOfStockItemEventArgs`
+    -   `PaymentCompleteEventArgs`
+    -   `TransactionCancelledEventArgs`
 
 ---
 
@@ -578,37 +621,38 @@ This document provides the low-level design for the Vending Machine System, deta
 ### 3.3. Dispense Item and Change
 
 1. After sufficient payment:
-   - `AwaitingPaymentState.InsertCash` calculates change.
-   - Calls `VendingMachine.DispenseItem` and `VendingMachine.DispenseChange`.
+    - `AwaitingPaymentState.InsertCash` calculates change.
+    - Calls `VendingMachine.DispenseItem` and `VendingMachine.DispenseChange`.
 2. Transitions to `IdleState`.
 
 ---
 
 ## 4. Error Handling
 
-- **Invalid Item Selection**: Raise `InvalidItemSelectedEventArgs`.
-- **Out of Stock**: Raise `OutOfStockItemEventArgs`.
-- **Invalid Cash Denomination**: Raise `BillRejectedEventArgs`.
-- **Hardware Failure**:
-  - Add logging and fallback mechanisms (e.g., retry operations).
+-   **Invalid Item Selection**: Raise `InvalidItemSelectedEventArgs`.
+-   **Out of Stock**: Raise `OutOfStockItemEventArgs`.
+-   **Invalid Cash Denomination**: Raise `BillRejectedEventArgs`.
+-   **Hardware Failure**:
+    -   Add logging and fallback mechanisms (e.g., retry operations).
 
 ---
 
 ## 5. Testing Plan
 
 1. **Unit Tests**:
-   - Test individual methods, such as `SelectItem`, `InsertCash`, and `MakeChange`.
-   - Validate state transitions (e.g., `IdleState` to `AwaitingPaymentState`).
+
+    - Test individual methods, such as `SelectItem`, `InsertCash`, and `MakeChange`.
+    - Validate state transitions (e.g., `IdleState` to `AwaitingPaymentState`).
 
 2. **Integration Tests**:
-   - Simulate end-to-end scenarios (e.g., item selection, payment, and dispensing).
+
+    - Simulate end-to-end scenarios (e.g., item selection, payment, and dispensing).
 
 3. **Edge Cases**:
-   - Invalid item selection, insufficient payment, or cancelled transactions.
+    - Invalid item selection, insufficient payment, or cancelled transactions.
 
 ---
 
 ## 6. Conclusion
 
 This low-level design provides a granular blueprint for implementing the Vending Machine system. Each component is modular and testable, ensuring the system is extensible, robust, and easy to maintain. Further extensions can include digital payment integration or advanced inventory management systems.
-
