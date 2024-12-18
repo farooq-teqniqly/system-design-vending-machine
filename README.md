@@ -143,7 +143,7 @@ class NoChange extends Change
 
 ```plantuml
 @startuml
-
+left to right direction
 class VendingMachineEventArgs {
     + string Message { get; }
     --
@@ -163,7 +163,7 @@ class ItemSelectedEventArgs extends VendingMachineEventArgs
 class LowInventoryItemEventArgs extends VendingMachineEventArgs
 class PaymentCompleteEventArgs extends VendingMachineEventArgs
 class TransactionCancelledEventArgs extends VendingMachineEventArgs
-
+class OutOfStockItemEventArgs extends VendingMachineEventArgs
 @enduml
 
 ```
