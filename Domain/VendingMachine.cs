@@ -15,7 +15,7 @@ public sealed class VendingMachine
     public event EventHandler<VendingMachineEventArgs>? OnMessageRaised;
 
     public IState CurrentState { get; set; }
-    
+
     public VendingMachine(IInventoryManager inventoryManager, IMoneyManager moneyManager)
     {
         _inventoryManager = inventoryManager;

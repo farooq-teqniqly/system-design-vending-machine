@@ -1,4 +1,4 @@
-﻿using Domain.EventArgs;
+using Domain.EventArgs;
 using Domain.Inventory;
 using Domain.Money;
 

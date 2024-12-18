@@ -1,4 +1,4 @@
-﻿using Domain.EventArgs;
+using Domain.EventArgs;
 using Domain.Inventory;
 using Domain.Money;
 using FluentAssertions;
@@ -7,7 +7,7 @@ namespace Domain.Tests;
 public class VendingMachineTests
 {
     private readonly InventoryManager _inventoryManager = new(new InventoryManagerConfiguration(1));
-    private readonly MoneyManager _moneyManager = new ();
+    private readonly MoneyManager _moneyManager = new();
     private readonly VendingMachine _vendingMachine;
 
     public VendingMachineTests()
@@ -100,7 +100,7 @@ public class VendingMachineTests
         // Arrange
         var item = new Item("A1", "Chips", 2.49m, 2);
         _inventoryManager.AddItem(item);
-        
+
         var eventArgsList = new List<VendingMachineEventArgs>();
         _vendingMachine.OnMessageRaised += (_, args) => eventArgsList.Add(args);
 
@@ -128,7 +128,7 @@ public class VendingMachineTests
         // Arrange
         var item = new Item("A1", "Chips", 2.49m, 2);
         _inventoryManager.AddItem(item);
-        
+
         var eventArgsList = new List<VendingMachineEventArgs>();
         _vendingMachine.OnMessageRaised += (_, args) => eventArgsList.Add(args);
 

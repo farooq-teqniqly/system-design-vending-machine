@@ -1,4 +1,4 @@
-﻿using Domain.Money;
+using Domain.Money;
 
 namespace Domain.EventArgs;
 

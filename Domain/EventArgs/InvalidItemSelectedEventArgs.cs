@@ -1,4 +1,4 @@
-﻿namespace Domain.EventArgs;
+namespace Domain.EventArgs;
 
 public class InvalidItemSelectedEventArgs : VendingMachineEventArgs
 {

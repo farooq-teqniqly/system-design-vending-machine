@@ -1,4 +1,4 @@
-﻿using Domain.Inventory;
+using Domain.Inventory;
 
 namespace Domain.EventArgs;
 
