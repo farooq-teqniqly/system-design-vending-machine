@@ -180,7 +180,7 @@ public class VendingMachineTests
         _vendingMachine.InsertCash(5);
 
         // Assert
-        var outOfStockItemEventArgs = eventArgsList.Single(a => a.GetType() == typeof(OutOfStockItemEventArgs))
+        var outOfStockItemEventArgs = eventArgsList.First(a => a.GetType() == typeof(OutOfStockItemEventArgs))
             .As<OutOfStockItemEventArgs>();
 
         var outOfStockItem = outOfStockItemEventArgs.Item;
@@ -222,6 +222,30 @@ public class VendingMachineTests
 
         lowInventoryItemEventArgs.Single(a => a.Item.ItemId == "A2").Item.Quantity.Should().Be(1);
 
+
+    }
+
+    [Fact]
+    public void Can_Receive_Notifications_When_Item_Is_Out_Of_Stock()
+    {
+        // Arrange
+        var item = new Item("A1", "Chips", 2.49m, 1);
+
+        _inventoryManager.AddItem(item);
+
+        var eventArgsList = new List<VendingMachineEventArgs>();
+        _vendingMachine.OnMessageRaised += (_, args) => eventArgsList.Add(args);
+
+        // Act
+        _vendingMachine.SelectItem("A1");
+        _vendingMachine.InsertCash(5);
+
+        // Assert
+        var outOfStockItemEventArgs = eventArgsList.Single(a => a.GetType() == typeof(OutOfStockItemEventArgs))
+            .As<OutOfStockItemEventArgs>();
+
+        outOfStockItemEventArgs.Item.ItemId.Should().Be("A1");
+        outOfStockItemEventArgs.Item.Quantity.Should().Be(0);
 
     }
 }

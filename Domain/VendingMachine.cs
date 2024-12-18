@@ -60,7 +60,14 @@ public sealed class VendingMachine
 
         foreach (var lowInventoryItem in lowInventoryItems)
         {
-            OnMessageRaised?.Invoke(this, new LowInventoryItemEventArgs(lowInventoryItem));
+            if (lowInventoryItem.Quantity == 0)
+            {
+                OnMessageRaised?.Invoke(this, new OutOfStockItemEventArgs(lowInventoryItem));
+            }
+            else
+            {
+                OnMessageRaised?.Invoke(this, new LowInventoryItemEventArgs(lowInventoryItem));
+            }
         }
     }
 

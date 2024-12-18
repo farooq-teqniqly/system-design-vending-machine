@@ -10,10 +10,10 @@ public class Program
     {
         var items = new List<Item>()
         {
-            new("A1", "Chips", 1.99m, 10),
-            new("A2", "Soda", 1.50m, 5),
+            new("A1", "Chips", 1.99m, 3),
+            new("A2", "Soda", 1.50m, 3),
             new ("A3", "Cookies", 4.39m, 3),
-            new ("A4", "Gum", 0.89m, 10)
+            new ("A4", "Gum", 0.89m, 3)
         };
 
         var twoParamCommands = new[] { "select", "insert" };
