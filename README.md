@@ -28,96 +28,112 @@ NotifySysadmin : Low stock notification
 ```plantuml
 @startuml
 
-' Base class for denominations (Bills and Coins)
-abstract class Denomination {
-    + Value: int
-    + Name: string
-    + ToString(): string
-}
-
-class Bill extends Denomination {
-    + Bill(int value, string name)
-}
-
-class Coin extends Denomination {
-    + Coin(int value, string name)
-}
-
-class MoneyManager {
-    + IsValidBill(int amount): bool
-    + CalculateChange(int amountInCents): Dictionary<Coin, int>
-}
-
 class VendingMachine {
-    + CurrentState: IVendingMachineState
-    + SelectedItemPrice: int
-    + SelectedItemCode: string
-    + SelectItem(string itemCode)
-    + InsertCash(int amount)
-    + CancelTransaction()
-    + DispenseItem(int changeInCents)
-    + Refund(int amountInDollars)
-    + RaiseEvent(string message)
-    + event OnMessageRaised: EventHandler<string>
+    - IInventoryManager _inventoryManager
+    - IMoneyManager _moneyManager
+    + Item SelectedItem
+    + IState CurrentState
+    + event OnMessageRaised : EventHandler<VendingMachineEventArgs>?
+    --
+    + VendingMachine(IInventoryManager inventoryManager, IMoneyManager moneyManager)
+    + void SelectItem(string itemId)
+    + void InsertCash(int amount)
+    + void DispenseItem()
+    + void DispenseChange(int amount)
+    + void Refund(int amount)
+    + void CancelTransaction()
+    + void RaiseEvent(VendingMachineEventArgs args)
 }
 
-interface IVendingMachineState {
-    + SelectItem(string itemCode)
-    + InsertCash(int amount)
-    + CancelTransaction()
+class Item <<record>> {
+    + string ItemId
+    + string Name
+    + decimal Price
+    + int Quantity
 }
 
-class IdleState implements IVendingMachineState {
-    + SelectItem(string itemCode)
-    + InsertCash(int amount)
-    + CancelTransaction()
+class InvalidItem extends Item
+class NullItem extends Item
+class OutOfStockItem extends Item
+
+interface IInventoryManager {
+    + void AddItem(Item item)
+    + IEnumerable<Item> GetAvailableItems()
+    + Item GetItem(string itemId)
+    + void AddItems(IEnumerable<Item> items)
+    + void ItemSold(string itemId)
+    + IEnumerable<Item> GetLowInventoryItems()
 }
 
-class AwaitingPaymentState implements IVendingMachineState {
-    + SelectItem(string itemCode)
-    + InsertCash(int amount)
-    + CancelTransaction()
+class InventoryManager implements IInventoryManager
+
+class InventoryManagerConfiguration {
+    + int LowInventoryThreshold { get; }
+    --
+    + InventoryManagerConfiguration(int lowInventoryThreshold=2)
 }
 
-class DispensingState implements IVendingMachineState {
-    + SelectItem(string itemCode)
-    + InsertCash(int amount)
-    + CancelTransaction()
+InventoryManager --> InventoryManagerConfiguration
+
+interface IMoneyManager {
+    + bool IsValidBillDenomination(int amount)
+    + Change MakeChange(int amount)
 }
 
-class NotifyOperatorState implements IVendingMachineState {
-    + NotifyLowStockItems()
-    + SelectItem(string itemCode)
-    + InsertCash(int amount)
-    + CancelTransaction()
+class MoneyManager implements IMoneyManager
+
+interface IState {
+    + void SelectItem(Item item)
+    + void InsertCash(int amount)
+    + void CancelTransaction()
 }
 
-class InventoryManager {
-    + AddItem(string itemCode, Item item)
-    + IsItemAvailable(string itemCode): bool
-    + GetItemPrice(string itemCode): int
-    + DeductItem(string itemCode)
-    + GetLowStockItems(): List<Item>
-    + DisplayItems()
+class IdleState implements IState
+
+class AwaitingPaymentState implements IState
+
+
+class Change {
+    + int Quarters { get; }
+    + int Dimes { get; }
+    + int Nickels { get; }
+    + int Pennies { get; }
+    --
+    + Change(int quarters, int dimes, int nickels, int pennies)
+    + string ToString()
 }
 
-class Item {
-    + Code: string
-    + Name: string
-    + Price: int
-    + Quantity: int
-    + ToString(): string
+class NoChange extends Change
+
+@enduml
+
+
+```
+
+
+### Events
+```plantuml
+@startuml
+
+class VendingMachineEventArgs {
+    + string Message { get; }
+    --
+    + VendingMachineEventArgs(string message)
 }
 
-MoneyManager --> Bill
-MoneyManager --> Coin
-VendingMachine --> IVendingMachineState
-IdleState --> VendingMachine
-AwaitingPaymentState --> VendingMachine
-DispensingState --> VendingMachine
-NotifyOperatorState --> VendingMachine
-InventoryManager --> Item
-VendingMachine --> InventoryManager
+class VendingMachineEventArgs extends System.EventArgs
+class BillAcceptedEventArgs extends VendingMachineEventArgs
+class BillRejectedEventArgs extends VendingMachineEventArgs
+class ChangeDispensedEventArgs extends VendingMachineEventArgs
+class InsertMoreMoneyEventArgs extends VendingMachineEventArgs
+
+class InvalidItemSelectedEventArgs extends VendingMachineEventArgs
+class ItemAlreadySelectedEventArgs extends VendingMachineEventArgs
+class ItemDispensedEventArgs extends VendingMachineEventArgs
+class ItemSelectedEventArgs extends VendingMachineEventArgs
+class LowInventoryItemEventArgs extends VendingMachineEventArgs
+class PaymentCompleteEventArgs extends VendingMachineEventArgs
+class TransactionCancelledEventArgs extends VendingMachineEventArgs
 
 @enduml
 
