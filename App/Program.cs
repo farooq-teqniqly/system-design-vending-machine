@@ -29,11 +29,11 @@ public class Program
         DisplayCommands();
         Console.WriteLine(Environment.NewLine);
 
-        DisplayItems(items);
-        Console.WriteLine(Environment.NewLine);
-
         while (true)
         {
+            DisplayAvailableItems(inventoryManager.GetAvailableItems());
+            Console.WriteLine(Environment.NewLine);
+
             Console.WriteLine("enter command: ");
             var input = Console.ReadLine()?.Trim();
 
@@ -85,12 +85,15 @@ public class Program
         Console.WriteLine("Commands:\n");
         Console.WriteLine("SELECT <item id>");
         Console.WriteLine("INSERT <cash denomination>");
+        Console.WriteLine("VIEW");
         Console.WriteLine("CANCEL");
         Console.WriteLine("EXIT");
     }
 
-    private static void DisplayItems(IEnumerable<Item> items)
+    private static void DisplayAvailableItems(IEnumerable<Item> items)
     {
+        Console.WriteLine("Available items:\n");
+
         foreach (var item in items)
         {
             Console.WriteLine(item);

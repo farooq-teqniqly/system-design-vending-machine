@@ -13,11 +13,16 @@ public sealed class InventoryManager : IInventoryManager
         }
     }
 
-    public IEnumerable<Item> GetItems() => _items.Values;
+    public IEnumerable<Item> GetAvailableItems() => _items.Values.Where(i => i.Quantity > 0);
 
     public Item GetItem(string itemId)
     {
-        return _items.TryGetValue(itemId, out var item) ? item : new NullItem();
+        if (!_items.TryGetValue(itemId, out var item))
+        {
+            return new NullItem();
+        }
+
+        return item.Quantity == 0 ? new NullItem() : item;
     }
 
     public void AddItems(IEnumerable<Item> items)
@@ -26,5 +31,13 @@ public sealed class InventoryManager : IInventoryManager
         {
             _items.Add(item.ItemId, item);
         }
+    }
+
+    public void ItemSold(string itemId)
+    {
+        var item = _items[itemId];
+
+        _items.Remove(itemId);
+        _items.Add(itemId, new Item(itemId, item.Name, item.Price, item.Quantity - 1));
     }
 }

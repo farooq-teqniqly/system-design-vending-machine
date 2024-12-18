@@ -14,8 +14,7 @@ public sealed class VendingMachine
     public event EventHandler<VendingMachineEventArgs>? OnMessageRaised;
 
     public IState CurrentState { get; set; }
-    public int ChangeToDispense { get; set; }
-
+    
     public VendingMachine(IInventoryManager inventoryManager, IMoneyManager moneyManager)
     {
         _inventoryManager = inventoryManager;
@@ -52,6 +51,7 @@ public sealed class VendingMachine
     {
         OnMessageRaised?.Invoke(this, new VendingMachineEventArgs($"item dispensed: {SelectedItem}"));
 
+        _inventoryManager.ItemSold(SelectedItem!.ItemId);
     }
 
     public void DispenseChange(int change)
