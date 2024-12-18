@@ -2,38 +2,38 @@ namespace Domain.Money;
 public sealed class MoneyManager : IMoneyManager
 {
     private static readonly int[] _validBillDenominations = new[] { 1, 5, 10, 20 };
-    private static readonly int[] _validCoinDenominations = new[] { 1, 5, 10, 25 };
-
+    
     public bool IsValidBillDenomination(int amount) => _validBillDenominations.Contains(amount);
 
-    public IDictionary<int, int> DispenseChange(int amount)
+    public Change MakeChange(int amount)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
+        ArgumentOutOfRangeException.ThrowIfNegative(amount);
 
-        var orderedCoinDenominations = _validCoinDenominations.AsEnumerable().OrderDescending().ToArray();
-
-        var change = new Dictionary<int, int>();
+        if (amount == 0)
+        {
+            return new NoChange();
+        }
 
         var amountLeft = amount;
 
-        foreach (var denomination in orderedCoinDenominations)
+        var quarters = amountLeft / 25;
+        amountLeft %= 25;
+
+        var dimes = amountLeft / 10;
+        amountLeft %= 10;
+
+        var nickels = amountLeft / 5;
+        amountLeft %= 5;
+
+        var pennies = amountLeft / 1;
+        amountLeft %= 1;
+
+        if (amountLeft != 0)
         {
-            if (amountLeft == 0)
-            {
-                break;
-            }
-
-            var coinCount = amountLeft / denomination;
-
-            if (coinCount == 0)
-            {
-                continue;
-            }
-
-            change.Add(denomination, coinCount);
-            amountLeft -= denomination * coinCount;
+            throw new InvalidOperationException("unable to make change");
         }
 
-        return change;
+        return new Change(quarters, dimes, nickels, pennies);
     }
+
 }

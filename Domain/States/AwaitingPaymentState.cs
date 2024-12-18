@@ -1,10 +1,11 @@
 using Domain.Inventory;
+using Domain.Money;
 
 namespace Domain.States;
 public sealed class AwaitingPaymentState : IState
 {
     private readonly VendingMachine _vendingMachine;
-    private decimal _totalInsertedAmount;
+    private int _totalInsertedAmount;
 
     public AwaitingPaymentState(VendingMachine vendingMachine)
     {
@@ -18,7 +19,7 @@ public sealed class AwaitingPaymentState : IState
     public void InsertCash(int amount)
     {
         _totalInsertedAmount += amount;
-        _vendingMachine.RaiseEvent(new VendingMachineEventArgs($"bill inserted: {amount}"));
+        _vendingMachine.RaiseEvent(new BillAcceptedEventArgs(amount));
 
         var itemPrice = _vendingMachine.SelectedItem!.Price;
 
@@ -32,35 +33,17 @@ public sealed class AwaitingPaymentState : IState
 
         var change = _totalInsertedAmount - itemPrice;
 
-        _vendingMachine.RaiseEvent(new VendingMachineEventArgs("payment complete"));
-
-        _vendingMachine.RaiseEvent(new VendingMachineEventArgs($"paid: {_totalInsertedAmount}"));
-
-        _vendingMachine.RaiseEvent(new VendingMachineEventArgs($"change: {change}"));
+        _vendingMachine.RaiseEvent(new PaymentCompleteEventArgs(_totalInsertedAmount, change));
 
         _vendingMachine.DispenseItem();
-
-        if (change != 0)
-        {
-            _vendingMachine.DispenseChange((int)((_totalInsertedAmount - itemPrice) * 100));
-        }
+        _vendingMachine.DispenseChange((int)(change * 100));
 
         _vendingMachine.CurrentState = new IdleState(_vendingMachine);
     }
 
     public void CancelTransaction()
     {
-        _vendingMachine.RaiseEvent(new VendingMachineEventArgs("transaction cancelled"));
-
-        if (_totalInsertedAmount != 0)
-        {
-            _vendingMachine.RaiseEvent(new VendingMachineEventArgs($"paid: {_totalInsertedAmount}"));
-
-            _vendingMachine.RaiseEvent(new VendingMachineEventArgs($"refund: {_totalInsertedAmount}"));
-
-            _vendingMachine.Refund(_totalInsertedAmount);
-        }
-
+        _vendingMachine.Refund(_totalInsertedAmount * 100);
         _vendingMachine.CurrentState = new IdleState(_vendingMachine);
     }
 

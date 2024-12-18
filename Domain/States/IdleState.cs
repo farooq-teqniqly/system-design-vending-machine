@@ -12,7 +12,7 @@ public sealed class IdleState : IState
     }
     public void SelectItem(Item item)
     {
-        _vendingMachine.RaiseEvent(new VendingMachineEventArgs($"selected item: `{item}`"));
+        _vendingMachine.RaiseEvent(new ItemSelectedEventArgs(item));
         _vendingMachine.CurrentState = new AwaitingPaymentState(_vendingMachine);
     }
 
