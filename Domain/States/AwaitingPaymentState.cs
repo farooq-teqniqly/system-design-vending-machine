@@ -1,17 +1,18 @@
+using Domain.Inventory;
 using Domain.Money;
 
 namespace Domain.States;
-public sealed class AwaitPaymentState : IState
+public sealed class AwaitingPaymentState : IState
 {
     private readonly VendingMachine _vendingMachine;
 
-    public AwaitPaymentState(VendingMachine vendingMachine)
+    public AwaitingPaymentState(VendingMachine vendingMachine)
     {
         _vendingMachine = vendingMachine;
     }
-    public void SelectItem(string itemId)
+    public void SelectItem(Item item)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public void InsertCash(Bill bill)
@@ -26,6 +27,6 @@ public sealed class AwaitPaymentState : IState
 
     public void NotifyLowStockItems()
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 }

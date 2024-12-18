@@ -1,8 +1,10 @@
-﻿namespace Domain.Inventory;
+namespace Domain.Inventory;
 
 public interface IInventoryManager
 {
     void AddItem(Item item);
     IEnumerable<Item> GetItems();
-    bool ItemExists(string itemId);
+    Item GetItem(string itemId);
+
+    void AddItems(IEnumerable<Item> items);
 }

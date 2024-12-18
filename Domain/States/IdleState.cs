@@ -6,24 +6,15 @@ namespace Domain.States;
 public sealed class IdleState : IState
 {
     private readonly VendingMachine _vendingMachine;
-    private readonly IInventoryManager _inventoryManager;
 
-    public IdleState(
-        VendingMachine vendingMachine,
-        IInventoryManager inventoryManager)
+    public IdleState(VendingMachine vendingMachine)
     {
         _vendingMachine = vendingMachine;
-        _inventoryManager = inventoryManager;
     }
-    public void SelectItem(string itemId)
+    public void SelectItem(Item item)
     {
-        if (!_inventoryManager.ItemExists(itemId))
-        {
-            _vendingMachine.RaiseEvent(new VendingMachineEventArgs($"invalid item `{itemId}`"));
-        }
-
-        _vendingMachine.RaiseEvent(new VendingMachineEventArgs($"select item `{itemId}`"));
-        _vendingMachine.CurrentState = new AwaitPaymentState(_vendingMachine);
+        _vendingMachine.RaiseEvent(new VendingMachineEventArgs($"selected item: `{item}`"));
+        _vendingMachine.CurrentState = new AwaitingPaymentState(_vendingMachine);
     }
 
     public void InsertCash(Bill bill)

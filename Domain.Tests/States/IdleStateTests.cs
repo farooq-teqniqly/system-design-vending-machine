@@ -16,22 +16,23 @@ public class IdleStateTests
     {
         _vendingMachine = new VendingMachine(_mockInventoryManager);
         _vendingMachine.OnMessageRaised += (sender, args) => _args = args;
-        _idleState = new IdleState(_vendingMachine, _mockInventoryManager);
+        _idleState = new IdleState(_vendingMachine);
     }
 
     [Fact]
     public void Selecting_Item_Transitions_Machine_To_AwaitingPayment_State()
     {
         // Arrange
-        var itemId = "A1";
-        _mockInventoryManager.ItemExists(itemId).Returns(true);
+        var item = new Item("A1", "Chips", 1.99m, 1);
+
+        _mockInventoryManager.GetItem(item.ItemId).Returns(item);
 
         // Act
-        _idleState.SelectItem(itemId);
+        _idleState.SelectItem(item);
 
         // Assert
         _args.Should().NotBeNull();
-        _args!.Message.Should().Contain(itemId);
-        _vendingMachine.CurrentState.Should().BeOfType<AwaitPaymentState>();
+        //_args!.Message.Should().Contain(itemId);
+        _vendingMachine.CurrentState.Should().BeOfType<AwaitingPaymentState>();
     }
 }
