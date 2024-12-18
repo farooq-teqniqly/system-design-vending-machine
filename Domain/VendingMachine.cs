@@ -1,3 +1,4 @@
+using System.Text;
 using Domain.Inventory;
 using Domain.Money;
 using Domain.States;
@@ -40,7 +41,7 @@ public sealed class VendingMachine
     {
         if (!_moneyManager.IsValidBillDenomination(amount))
         {
-            RaiseEvent(new VendingMachineEventArgs("invalid bill denomination"));
+            RaiseEvent(new VendingMachineEventArgs("bill rejected - invalid denomination"));
             return;
         }
 
@@ -50,5 +51,40 @@ public sealed class VendingMachine
     public void RaiseEvent(VendingMachineEventArgs args)
     {
         OnMessageRaised?.Invoke(this, args);
+    }
+
+    public void DispenseItem()
+    {
+        OnMessageRaised?.Invoke(this, new VendingMachineEventArgs($"item dispensed: {SelectedItem}"));
+
+    }
+
+    public void DispenseChange(int change)
+    {
+        Refund(change);
+    }
+
+    public void Refund(decimal totalInsertedAmount)
+    {
+        var refundInCents = (int)totalInsertedAmount * 100;
+        Refund(refundInCents);
+    }
+    public void Refund(int amount)
+    {
+        var change = _moneyManager.DispenseChange(amount);
+
+        var sb = new StringBuilder("change dispensed (Denomination, Number of coins):\n");
+
+        foreach (var keyValuePair in change)
+        {
+            sb.AppendLine($"({keyValuePair.Key}, {keyValuePair.Value})");
+        }
+
+        OnMessageRaised?.Invoke(this, new VendingMachineEventArgs(sb.ToString()));
+    }
+
+    public void CancelTransaction()
+    {
+        CurrentState.CancelTransaction();
     }
 }

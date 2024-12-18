@@ -1,5 +1,4 @@
 using Domain.Inventory;
-using Domain.Money;
 
 namespace Domain.States;
 public sealed class AwaitingPaymentState : IState
@@ -31,14 +30,38 @@ public sealed class AwaitingPaymentState : IState
             return;
         }
 
-        _vendingMachine.ChangeToDispense = (int)((itemPrice - _totalInsertedAmount) * 100);
+        var change = _totalInsertedAmount - itemPrice;
+
         _vendingMachine.RaiseEvent(new VendingMachineEventArgs("payment complete"));
-        _vendingMachine.CurrentState = new DispenseState(_vendingMachine);
+
+        _vendingMachine.RaiseEvent(new VendingMachineEventArgs($"paid: {_totalInsertedAmount}"));
+
+        _vendingMachine.RaiseEvent(new VendingMachineEventArgs($"change: {change}"));
+
+        _vendingMachine.DispenseItem();
+
+        if (change != 0)
+        {
+            _vendingMachine.DispenseChange((int)((_totalInsertedAmount - itemPrice) * 100));
+        }
+
+        _vendingMachine.CurrentState = new IdleState(_vendingMachine);
     }
 
     public void CancelTransaction()
     {
-        throw new NotImplementedException();
+        _vendingMachine.RaiseEvent(new VendingMachineEventArgs("transaction cancelled"));
+
+        if (_totalInsertedAmount != 0)
+        {
+            _vendingMachine.RaiseEvent(new VendingMachineEventArgs($"paid: {_totalInsertedAmount}"));
+
+            _vendingMachine.RaiseEvent(new VendingMachineEventArgs($"refund: {_totalInsertedAmount}"));
+
+            _vendingMachine.Refund(_totalInsertedAmount);
+        }
+
+        _vendingMachine.CurrentState = new IdleState(_vendingMachine);
     }
 
     public void NotifyLowStockItems()

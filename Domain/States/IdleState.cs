@@ -1,5 +1,4 @@
 using Domain.Inventory;
-using Domain.Money;
 
 namespace Domain.States;
 

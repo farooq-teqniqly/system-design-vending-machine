@@ -16,6 +16,8 @@ public class Program
             new ("A4", "Gum", 0.89m, 10)
         };
 
+        var twoParamCommands = new[] { "select", "insert" };
+
         var inventoryManager = new InventoryManager();
         inventoryManager.AddItems(items);
 
@@ -42,7 +44,7 @@ public class Program
 
             var command = input.Split(" ", StringSplitOptions.TrimEntries);
 
-            if (command.Length < 2)
+            if (twoParamCommands.Contains(command[0]) && command.Length < 2)
             {
                 Console.WriteLine("invalid command");
                 continue;
@@ -63,6 +65,9 @@ public class Program
                         vendingMachine.InsertCash(amount);
                     }
 
+                    break;
+                case "cancel":
+                    vendingMachine.CancelTransaction();
                     break;
                 case "exit":
                     Console.WriteLine("thanks for using the vending machine");
