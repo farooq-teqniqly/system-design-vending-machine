@@ -72,3 +72,23 @@ public class BillRejectedEventArgs : VendingMachineEventArgs
         Denomination = denomination;
     }
 }
+
+public class InvalidItemSelectedEventArgs : VendingMachineEventArgs
+{
+    public string ItemId { get; }
+
+    public InvalidItemSelectedEventArgs(string itemId) : base($"invalid item selected: {itemId}")
+    {
+        ItemId = itemId;
+    }
+}
+
+public class OutOfStockItemEventArgs : VendingMachineEventArgs
+{
+    public Item Item { get; }
+
+    public OutOfStockItemEventArgs(Item item) : base($"item out of stock: {item}")
+    {
+        Item = item;
+    }
+}

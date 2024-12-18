@@ -13,20 +13,24 @@ public class VendingMachineTests
     {
         _vendingMachine = new VendingMachine(_inventoryManager, _moneyManager);
     }
+
     [Fact]
     public void Can_Buy_An_Item_And_Get_Correct_Change()
     {
+        // Arrange
         var item = new Item("A1", "Chips", 2.29m, 1);
         _inventoryManager.AddItem(item);
 
         var eventArgsList = new List<VendingMachineEventArgs>();
-        _vendingMachine.OnMessageRaised += (sender, args) => eventArgsList.Add(args);
+        _vendingMachine.OnMessageRaised += (_, args) => eventArgsList.Add(args);
 
+        // Act
         _vendingMachine.SelectItem(item.ItemId);
         _vendingMachine.InsertCash(1);
         _vendingMachine.InsertCash(1);
         _vendingMachine.InsertCash(1);
 
+        // Assert
         eventArgsList.Single(a => a.GetType() == typeof(ItemSelectedEventArgs)).As<ItemSelectedEventArgs>().Item
             .Should().Be(item);
 
@@ -50,15 +54,18 @@ public class VendingMachineTests
     [Fact]
     public void Can_Buy_An_Item_With_No_Change_Back()
     {
+        // Arrange
         var item = new Item("A1", "Chips", 1m, 1);
         _inventoryManager.AddItem(item);
 
         var eventArgsList = new List<VendingMachineEventArgs>();
-        _vendingMachine.OnMessageRaised += (sender, args) => eventArgsList.Add(args);
+        _vendingMachine.OnMessageRaised += (_, args) => eventArgsList.Add(args);
 
+        // Act
         _vendingMachine.SelectItem(item.ItemId);
         _vendingMachine.InsertCash(1);
 
+        // Assert
         var paymentCompleteEventArgs = eventArgsList.Single(a => a.GetType() == typeof(PaymentCompleteEventArgs))
             .As<PaymentCompleteEventArgs>();
 
@@ -74,30 +81,35 @@ public class VendingMachineTests
     [Fact]
     public void Quantity_Is_Updated_After_Item_Dispensed()
     {
+        // Arrange
         var item = new Item("A1", "Chips", 1m, 2);
         _inventoryManager.AddItem(item);
 
-        
+        // Act
         _vendingMachine.SelectItem(item.ItemId);
         _vendingMachine.InsertCash(1);
 
+        // Assert
         _inventoryManager.GetItem(item.ItemId).Quantity.Should().Be(1);
     }
 
     [Fact]
     public void Can_Cancel_Transaction()
     {
+        // Arrange
         var item = new Item("A1", "Chips", 2.49m, 2);
         _inventoryManager.AddItem(item);
         
         var eventArgsList = new List<VendingMachineEventArgs>();
-        _vendingMachine.OnMessageRaised += (sender, args) => eventArgsList.Add(args);
+        _vendingMachine.OnMessageRaised += (_, args) => eventArgsList.Add(args);
 
+        // Act
         _vendingMachine.SelectItem(item.ItemId);
         _vendingMachine.InsertCash(1);
         _vendingMachine.InsertCash(1);
         _vendingMachine.CancelTransaction();
 
+        // Assert
         var changeDispensedEventArgs = eventArgsList.Single(a => a.GetType() == typeof(ChangeDispensedEventArgs))
             .As<ChangeDispensedEventArgs>();
 
@@ -112,18 +124,68 @@ public class VendingMachineTests
     [Fact]
     public void Invalid_Bill_Denominations_Are_Rejected()
     {
+        // Arrange
         var item = new Item("A1", "Chips", 2.49m, 2);
         _inventoryManager.AddItem(item);
         
         var eventArgsList = new List<VendingMachineEventArgs>();
-        _vendingMachine.OnMessageRaised += (sender, args) => eventArgsList.Add(args);
+        _vendingMachine.OnMessageRaised += (_, args) => eventArgsList.Add(args);
 
+        // Act
         _vendingMachine.SelectItem(item.ItemId);
         _vendingMachine.InsertCash(50);
 
+        // Assert
         var billRejectedEventArgs = eventArgsList.Single(a => a.GetType() == typeof(BillRejectedEventArgs))
             .As<BillRejectedEventArgs>();
 
         billRejectedEventArgs.Denomination.Should().Be(50);
+    }
+
+    [Fact]
+    public void Cannot_Select_A_Non_Existent_Item()
+    {
+        // Arrange
+        var item = new Item("A1", "Chips", 2.49m, 2);
+        _inventoryManager.AddItem(item);
+
+        var eventArgsList = new List<VendingMachineEventArgs>();
+        _vendingMachine.OnMessageRaised += (_, args) => eventArgsList.Add(args);
+
+        // Act
+        _vendingMachine.SelectItem("Z1");
+
+        // Assert
+        var invalidItemSelectedEventArgs = eventArgsList.Single(a => a.GetType() == typeof(InvalidItemSelectedEventArgs))
+            .As<InvalidItemSelectedEventArgs>();
+
+        invalidItemSelectedEventArgs.ItemId.Should().Be("Z1");
+    }
+
+    [Fact]
+    public void Cannot_Select_An_Out_Of_Stock_Item()
+    {
+        // Arrange
+        var item = new Item("A1", "Chips", 2.49m, 1);
+        _inventoryManager.AddItem(item);
+
+        var eventArgsList = new List<VendingMachineEventArgs>();
+        _vendingMachine.OnMessageRaised += (_, args) => eventArgsList.Add(args);
+
+        // Act
+        _vendingMachine.SelectItem("A1");
+        _vendingMachine.InsertCash(5);
+
+        _vendingMachine.SelectItem("A1");
+        _vendingMachine.InsertCash(5);
+
+        // Assert
+        var outOfStockItemEventArgs = eventArgsList.Single(a => a.GetType() == typeof(OutOfStockItemEventArgs))
+            .As<OutOfStockItemEventArgs>();
+
+        var outOfStockItem = outOfStockItemEventArgs.Item;
+
+        outOfStockItem.ItemId.Should().Be(item.ItemId);
+        outOfStockItem.Quantity.Should().Be(0);
     }
 }

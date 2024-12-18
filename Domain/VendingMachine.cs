@@ -25,10 +25,14 @@ public sealed class VendingMachine
     {
         var item = _inventoryManager.GetItem(itemId);
 
-        if (item is NullItem)
+        switch (item)
         {
-            RaiseEvent(new VendingMachineEventArgs("invalid selection"));
-            return;
+            case InvalidItem:
+                RaiseEvent(new InvalidItemSelectedEventArgs(itemId));
+                return;
+            case OutOfStockItem:
+                RaiseEvent(new OutOfStockItemEventArgs(item));
+                break;
         }
 
         SelectedItem = item;

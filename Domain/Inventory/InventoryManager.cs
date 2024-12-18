@@ -19,10 +19,10 @@ public sealed class InventoryManager : IInventoryManager
     {
         if (!_items.TryGetValue(itemId, out var item))
         {
-            return new NullItem();
+            return new InvalidItem();
         }
 
-        return item.Quantity == 0 ? new NullItem() : item;
+        return item.Quantity == 0 ? new OutOfStockItem(item) : item;
     }
 
     public void AddItems(IEnumerable<Item> items)

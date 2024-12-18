@@ -24,7 +24,7 @@ public class Program
         var moneyManager = new MoneyManager();
 
         var vendingMachine = new VendingMachine(inventoryManager, moneyManager);
-        vendingMachine.OnMessageRaised += (sender, args) => Console.WriteLine(args.Message);
+        vendingMachine.OnMessageRaised += (_, args) => Console.WriteLine(args.Message);
 
         DisplayCommands();
         Console.WriteLine(Environment.NewLine);
