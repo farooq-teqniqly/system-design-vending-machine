@@ -4,6 +4,9 @@ using Domain.Money;
 
 namespace App;
 
+/// <summary>
+/// Represents the entry point of the application.
+/// </summary>
 public class Program
 {
     static void Main()
@@ -24,7 +27,12 @@ public class Program
         var moneyManager = new MoneyManager();
 
         var vendingMachine = new VendingMachine(inventoryManager, moneyManager);
-        vendingMachine.OnMessageRaised += (_, args) => Console.WriteLine(args.Message);
+        vendingMachine.OnMessageRaised += (_, args) =>
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(args.Message);
+            Console.ResetColor();
+        };
 
         DisplayCommands();
         
