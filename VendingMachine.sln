@@ -11,12 +11,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
+		README-Scratch.md = README-Scratch.md
 		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "App", "App\App.csproj", "{768C0D11-DE79-4492-AE3F-279309A5C06C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgrammingTask", "ProgrammingTask\ProgrammingTask.csproj", "{BAC18EFC-CC52-47A3-9D68-CF8087C7A308}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProgrammingTask", "ProgrammingTask\ProgrammingTask.csproj", "{BAC18EFC-CC52-47A3-9D68-CF8087C7A308}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
