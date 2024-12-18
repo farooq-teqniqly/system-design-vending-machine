@@ -1,3 +1,3 @@
-﻿namespace Domain.Money;
+namespace Domain.Money;
 
-public record Coin(string Name, decimal Value) : Denomination(Name, Value);
+public record Coin(decimal Value) : Denomination(Value);

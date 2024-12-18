@@ -17,7 +17,7 @@ public sealed class IdleState : IState
         _vendingMachine.CurrentState = new AwaitingPaymentState(_vendingMachine);
     }
 
-    public void InsertCash(Bill bill)
+    public void InsertCash(int amount)
     {
         throw new NotSupportedException();
     }

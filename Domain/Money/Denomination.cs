@@ -1,3 +1,3 @@
 namespace Domain.Money;
 
-public abstract record Denomination(string Name, decimal Value);
+public abstract record Denomination(decimal Value);

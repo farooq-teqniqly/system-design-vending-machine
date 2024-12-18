@@ -1,3 +1,3 @@
-﻿namespace Domain.Money;
+namespace Domain.Money;
 
-public record Bill(string Name, decimal Value) : Denomination(Name, Value);
+public record Bill(decimal Value) : Denomination(Value);

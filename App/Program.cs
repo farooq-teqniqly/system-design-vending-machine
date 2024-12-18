@@ -1,5 +1,6 @@
 using Domain;
 using Domain.Inventory;
+using Domain.Money;
 
 namespace App;
 
@@ -18,7 +19,9 @@ public class Program
         var inventoryManager = new InventoryManager();
         inventoryManager.AddItems(items);
 
-        var vendingMachine = new VendingMachine(inventoryManager);
+        var moneyManager = new MoneyManager();
+
+        var vendingMachine = new VendingMachine(inventoryManager, moneyManager);
         vendingMachine.OnMessageRaised += (sender, args) => Console.WriteLine(args.Message);
 
         DisplayCommands();
@@ -49,6 +52,17 @@ public class Program
             {
                 case "select":
                     vendingMachine.SelectItem(command[1].ToUpper());
+                    break;
+                case "insert":
+                    if (!int.TryParse(command[1], out var amount))
+                    {
+                        Console.WriteLine("invalid amount");
+                    }
+                    else
+                    {
+                        vendingMachine.InsertCash(amount);
+                    }
+
                     break;
                 case "exit":
                     Console.WriteLine("thanks for using the vending machine");

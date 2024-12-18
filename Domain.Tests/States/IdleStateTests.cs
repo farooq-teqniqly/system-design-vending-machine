@@ -1,4 +1,5 @@
 using Domain.Inventory;
+using Domain.Money;
 using Domain.States;
 using FluentAssertions;
 using NSubstitute;
@@ -11,10 +12,11 @@ public class IdleStateTests
     private readonly IdleState _idleState;
     private VendingMachineEventArgs? _args;
     private readonly IInventoryManager _mockInventoryManager = Substitute.For<IInventoryManager>();
+    private readonly IMoneyManager _moneyManager = new MoneyManager();
 
     public IdleStateTests()
     {
-        _vendingMachine = new VendingMachine(_mockInventoryManager);
+        _vendingMachine = new VendingMachine(_mockInventoryManager, _moneyManager);
         _vendingMachine.OnMessageRaised += (sender, args) => _args = args;
         _idleState = new IdleState(_vendingMachine);
     }
@@ -32,7 +34,7 @@ public class IdleStateTests
 
         // Assert
         _args.Should().NotBeNull();
-        //_args!.Message.Should().Contain(itemId);
+        _args!.Message.Should().Contain(item.ItemId);
         _vendingMachine.CurrentState.Should().BeOfType<AwaitingPaymentState>();
     }
 }

@@ -1,19 +1,24 @@
 using Domain.Inventory;
+using Domain.Money;
 using Domain.States;
 
 namespace Domain;
 public sealed class VendingMachine
 {
     private readonly IInventoryManager _inventoryManager;
-    private Item? _selectedItem;
+    private readonly IMoneyManager _moneyManager;
+
+    public Item? SelectedItem { get; private set; }
 
     public event EventHandler<VendingMachineEventArgs>? OnMessageRaised;
 
     public IState CurrentState { get; set; }
+    public int ChangeToDispense { get; set; }
 
-    public VendingMachine(IInventoryManager inventoryManager)
+    public VendingMachine(IInventoryManager inventoryManager, IMoneyManager moneyManager)
     {
         _inventoryManager = inventoryManager;
+        _moneyManager = moneyManager;
         CurrentState = new IdleState(this);
     }
 
@@ -27,8 +32,19 @@ public sealed class VendingMachine
             return;
         }
 
-        _selectedItem = item;
-        CurrentState.SelectItem(_selectedItem);
+        SelectedItem = item;
+        CurrentState.SelectItem(SelectedItem);
+    }
+
+    public void InsertCash(int amount)
+    {
+        if (!_moneyManager.IsValidBillDenomination(amount))
+        {
+            RaiseEvent(new VendingMachineEventArgs("invalid bill denomination"));
+            return;
+        }
+
+        CurrentState.InsertCash(amount);
     }
 
     public void RaiseEvent(VendingMachineEventArgs args)
