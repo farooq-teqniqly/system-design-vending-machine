@@ -1,3 +1,4 @@
+using System.IO.Enumeration;
 using Domain.Inventory;
 using Domain.Money;
 using Domain.States;
@@ -55,6 +56,12 @@ public sealed class VendingMachine
         OnMessageRaised?.Invoke(this, new ItemDispensedEventArgs(SelectedItem!));
 
         _inventoryManager.ItemSold(SelectedItem!.ItemId);
+        var lowInventoryItems = _inventoryManager.GetLowInventoryItems();
+
+        foreach (var lowInventoryItem in lowInventoryItems)
+        {
+            OnMessageRaised?.Invoke(this, new LowInventoryItemEventArgs(lowInventoryItem));
+        }
     }
 
     public void DispenseChange(int amount)

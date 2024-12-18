@@ -3,7 +3,13 @@ using Domain.Exceptions;
 namespace Domain.Inventory;
 public sealed class InventoryManager : IInventoryManager
 {
+    private readonly InventoryManagerConfiguration _config;
     private readonly Dictionary<string, Item> _items = new();
+
+    public InventoryManager(InventoryManagerConfiguration config)
+    {
+        _config = config;
+    }
 
     public void AddItem(Item item)
     {
@@ -39,5 +45,11 @@ public sealed class InventoryManager : IInventoryManager
 
         _items.Remove(itemId);
         _items.Add(itemId, new Item(itemId, item.Name, item.Price, item.Quantity - 1));
+    }
+
+    public IEnumerable<Item> GetLowInventoryItems()
+    {
+        return _items.Where(keyValuePairs => keyValuePairs.Value.Quantity <= _config.LowInventoryThreshold)
+            .Select(keyValuePair => keyValuePair.Value);
     }
 }

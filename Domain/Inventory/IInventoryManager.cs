@@ -8,4 +8,5 @@ public interface IInventoryManager
 
     void AddItems(IEnumerable<Item> items);
     void ItemSold(string itemId);
+    IEnumerable<Item> GetLowInventoryItems();
 }

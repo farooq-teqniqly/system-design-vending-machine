@@ -18,7 +18,7 @@ public class Program
 
         var twoParamCommands = new[] { "select", "insert" };
 
-        var inventoryManager = new InventoryManager();
+        var inventoryManager = new InventoryManager(new InventoryManagerConfiguration(2));
         inventoryManager.AddItems(items);
 
         var moneyManager = new MoneyManager();

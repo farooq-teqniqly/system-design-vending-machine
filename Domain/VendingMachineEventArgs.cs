@@ -92,3 +92,13 @@ public class OutOfStockItemEventArgs : VendingMachineEventArgs
         Item = item;
     }
 }
+
+public class LowInventoryItemEventArgs : VendingMachineEventArgs
+{
+    public Item Item { get; }
+
+    public LowInventoryItemEventArgs(Item item) : base($"item inventory low: {item}")
+    {
+        Item = item;
+    }
+}

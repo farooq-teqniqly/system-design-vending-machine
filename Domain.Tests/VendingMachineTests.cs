@@ -5,7 +5,7 @@ using FluentAssertions;
 namespace Domain.Tests;
 public class VendingMachineTests
 {
-    private readonly InventoryManager _inventoryManager = new();
+    private readonly InventoryManager _inventoryManager = new(new InventoryManagerConfiguration(1));
     private readonly MoneyManager _moneyManager = new ();
     private readonly VendingMachine _vendingMachine;
 
@@ -187,5 +187,41 @@ public class VendingMachineTests
 
         outOfStockItem.ItemId.Should().Be(item.ItemId);
         outOfStockItem.Quantity.Should().Be(0);
+    }
+
+    [Fact]
+    public void Can_Receive_Notifications_When_Item_Is_Low_On_Stock()
+    {
+        // Arrange
+        var item1 = new Item("A1", "Chips", 2.49m, 2);
+        var item2 = new Item("A2", "Soda", 1.50m, 2);
+
+        _inventoryManager.AddItem(item1);
+        _inventoryManager.AddItem(item2);
+
+        var eventArgsList = new List<VendingMachineEventArgs>();
+        _vendingMachine.OnMessageRaised += (_, args) => eventArgsList.Add(args);
+
+        // Act
+        _vendingMachine.SelectItem("A1");
+        _vendingMachine.InsertCash(5);
+
+        _vendingMachine.SelectItem("A2");
+        _vendingMachine.InsertCash(5);
+
+        // Assert
+        var lowInventoryItemEventArgs = eventArgsList.Where(a => a.GetType() == typeof(LowInventoryItemEventArgs))
+            .Cast<LowInventoryItemEventArgs>()
+            .ToList();
+
+        lowInventoryItemEventArgs.Should().HaveCount(3);
+
+        var a1Notifications = lowInventoryItemEventArgs.Where(a => a.Item.ItemId == "A1");
+
+        a1Notifications.All(a => a.Item.Quantity == 1).Should().BeTrue();
+
+        lowInventoryItemEventArgs.Single(a => a.Item.ItemId == "A2").Item.Quantity.Should().Be(1);
+
+
     }
 }
