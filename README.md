@@ -2,29 +2,30 @@
 
 ## PlantUML Diagrams
 
-### State Diagram
+[Online Editor](https://www.planttext.com/)
+[State Machine Diagrams](https://www.baeldung.com/cs/uml-state-diagrams)
+
+## State Diagram
 
 ```plantuml
 @startuml
+skinparam DefaultFontSize 8
 
-[*] --> Idle : Start
+[*] --> IdleState
 
-Idle --> AwaitingPayment : Select a single item
-AwaitingPayment --> Dispensing : Enough cash received
-AwaitingPayment --> Idle : Transaction canceled (refund)
-Dispensing --> Idle : Dispense item and give change
-Dispensing --> NotifySysadmin : Item(s) inventory low
-NotifySysadmin --> Idle : Sysadmin notified
+IdleState : Waiting for user interaction
+IdleState --> AwaitingPaymentState : SelectItem(item)
+IdleState --> IdleState : CancelTransaction()
 
-Idle : Waiting for user input
-AwaitingPayment : Waiting for enough cash or issue refund
-Dispensing : Dispensing item/change and checking inventory
-NotifySysadmin : Low stock notification
-
+AwaitingPaymentState : Waiting for payment
+AwaitingPaymentState --> IdleState : CancelTransaction()\nRefund(amount)
+AwaitingPaymentState --> IdleState : Payment complete\nDispenseItem()\nDispenseChange()
+AwaitingPaymentState --> AwaitingPaymentState : InsertCash(amount < itemPrice)
 @enduml
+
 ```
 
-### Class Diagram
+## Class Diagram
 ```plantuml
 @startuml
 
@@ -111,7 +112,7 @@ class NoChange extends Change
 ```
 
 
-### Events
+## Events
 ```plantuml
 @startuml
 
@@ -137,4 +138,159 @@ class TransactionCancelledEventArgs extends VendingMachineEventArgs
 
 @enduml
 
+```
+
+
+## Activity Diagrams for Vending Machine
+
+### SelectItem
+```plantuml
+@startuml
+actor User
+participant VendingMachine
+participant InventoryManager
+participant CurrentState
+
+User -> VendingMachine: SelectItem(itemId)
+VendingMachine -> VendingMachine: ArgumentException.ThrowIfNullOrWhiteSpace(itemId)
+
+alt SelectedItem is not NullItem
+    VendingMachine -> VendingMachine: RaiseEvent(ItemAlreadySelectedEventArgs)
+    return
+end
+
+VendingMachine -> InventoryManager: GetItem(itemId)
+InventoryManager --> VendingMachine: item
+
+alt item is InvalidItem
+    VendingMachine -> VendingMachine: RaiseEvent(InvalidItemSelectedEventArgs)
+    return
+else item is OutOfStockItem
+    VendingMachine -> VendingMachine: RaiseEvent(OutOfStockItemEventArgs)
+end
+
+VendingMachine -> VendingMachine: SelectedItem = item
+VendingMachine -> CurrentState: SelectItem(SelectedItem)
+@enduml
+
+```
+
+### Insert Cash
+```plantuml
+@startuml
+actor User
+participant VendingMachine
+participant MoneyManager
+participant CurrentState
+
+User -> VendingMachine: InsertCash(amount)
+VendingMachine -> VendingMachine: ArgumentOutOfRangeException.ThrowIfNegative(amount)
+
+alt Invalid Bill Denomination
+    VendingMachine -> MoneyManager: IsValidBillDenomination(amount)
+    MoneyManager --> VendingMachine: false
+    VendingMachine -> VendingMachine: RaiseEvent(BillRejectedEventArgs)
+    return
+else Valid Bill Denomination
+    VendingMachine -> MoneyManager: IsValidBillDenomination(amount)
+    MoneyManager --> VendingMachine: true
+    VendingMachine -> CurrentState: InsertCash(amount)
+end
+@enduml
+
+```
+
+## Refund
+```plantuml
+@startuml
+actor User
+participant VendingMachine
+participant MoneyManager
+
+User -> VendingMachine: Refund(amount)
+VendingMachine -> VendingMachine: ArgumentOutOfRangeException.ThrowIfNegative(amount)
+
+alt amount == 0
+    VendingMachine -> VendingMachine: OnMessageRaised(ChangeDispensedEventArgs(new NoChange()))
+    return
+else amount > 0
+    VendingMachine -> MoneyManager: MakeChange(amount)
+    MoneyManager --> VendingMachine: change
+    VendingMachine -> VendingMachine: OnMessageRaised(ChangeDispensedEventArgs(change))
+end
+@enduml
+
+```
+
+## Sequence Diagrams for IState Implementations
+
+### IdleState
+
+#### SelectItem
+```plantuml
+@startuml
+actor User
+participant IdleState
+participant VendingMachine
+participant AwaitingPaymentState
+
+User -> IdleState: SelectItem(item)
+IdleState -> IdleState: ArgumentNullException.ThrowIfNull(item)
+IdleState -> VendingMachine: RaiseEvent(ItemSelectedEventArgs)
+VendingMachine -> VendingMachine: CurrentState = new AwaitingPaymentState()
+@enduml
+
+```
+
+#### CancelTransaction
+```plantuml
+@startuml
+actor User
+participant IdleState
+participant VendingMachine
+
+User -> IdleState: CancelTransaction()
+IdleState -> VendingMachine: CurrentState = new IdleState()
+@enduml
+
+```
+
+### AwaitingPaymentState
+
+#### InsertCash
+```plantuml
+@startuml
+actor User
+participant AwaitingPaymentState
+participant VendingMachine
+
+User -> AwaitingPaymentState: InsertCash(amount)
+AwaitingPaymentState -> AwaitingPaymentState: ArgumentOutOfRangeException.ThrowIfNegative(amount)
+AwaitingPaymentState -> AwaitingPaymentState: _totalInsertedAmount += amount
+AwaitingPaymentState -> VendingMachine: RaiseEvent(BillAcceptedEventArgs(amount))
+
+alt _totalInsertedAmount < itemPrice
+    AwaitingPaymentState -> VendingMachine: RaiseEvent(InsertMoreMoneyEventArgs(totalInserted, needed))
+else _totalInsertedAmount >= itemPrice
+    AwaitingPaymentState -> AwaitingPaymentState: Calculate change
+    AwaitingPaymentState -> VendingMachine: RaiseEvent(PaymentCompleteEventArgs(totalInserted, change))
+    AwaitingPaymentState -> VendingMachine: DispenseItem()
+    AwaitingPaymentState -> VendingMachine: DispenseChange(change)
+    AwaitingPaymentState -> VendingMachine: CurrentState = new IdleState()
+end
+@enduml
+
+```
+
+#### CancelTransaction
+```plantuml
+@startuml
+actor User
+participant AwaitingPaymentState
+participant VendingMachine
+
+User -> AwaitingPaymentState: CancelTransaction()
+AwaitingPaymentState -> VendingMachine: Refund(_totalInsertedAmount * 100)
+AwaitingPaymentState -> VendingMachine: CurrentState = new IdleState()
+@enduml
 ```
