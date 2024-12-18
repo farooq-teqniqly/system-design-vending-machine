@@ -25,6 +25,12 @@ public sealed class VendingMachine
 
     public void SelectItem(string itemId)
     {
+        if (SelectedItem != null)
+        {
+            RaiseEvent(new ItemAlreadySelectedEventArgs(SelectedItem));
+            return;
+        }
+
         var item = _inventoryManager.GetItem(itemId);
 
         switch (item)
@@ -70,6 +76,8 @@ public sealed class VendingMachine
                 OnMessageRaised?.Invoke(this, new LowInventoryItemEventArgs(lowInventoryItem));
             }
         }
+
+        SelectedItem = null;
     }
 
     public void DispenseChange(int amount)
@@ -92,7 +100,9 @@ public sealed class VendingMachine
 
     public void CancelTransaction()
     {
+        OnMessageRaised?.Invoke(this, new TransactionCancelledEventArgs());
         CurrentState.CancelTransaction();
+        SelectedItem = null;
     }
 
     public void RaiseEvent(VendingMachineEventArgs args)

@@ -95,7 +95,7 @@ public class VendingMachineTests
     }
 
     [Fact]
-    public void Can_Cancel_Transaction()
+    public void Can_Cancel_Transaction_After_Inserting_Bill_But_Before_Payment_Complete()
     {
         // Arrange
         var item = new Item("A1", "Chips", 2.49m, 2);
@@ -120,6 +120,47 @@ public class VendingMachineTests
         refund.Dimes.Should().Be(0);
         refund.Nickels.Should().Be(0);
         refund.Pennies.Should().Be(0);
+    }
+
+    [Fact]
+    public void Can_Cancel_Transaction_After_Selecting_Item_But_Before_Inserting_Bill()
+    {
+        // Arrange
+        var item = new Item("A1", "Chips", 2.49m, 2);
+        _inventoryManager.AddItem(item);
+
+        var eventArgsList = new List<VendingMachineEventArgs>();
+        _vendingMachine.OnMessageRaised += (_, args) => eventArgsList.Add(args);
+
+        // Act
+        _vendingMachine.SelectItem(item.ItemId);
+        _vendingMachine.CancelTransaction();
+
+        // Assert
+        var transactionCancelledEventArgs = eventArgsList.SingleOrDefault(a => a.GetType() == typeof(TransactionCancelledEventArgs))
+            .As<TransactionCancelledEventArgs>();
+
+        transactionCancelledEventArgs.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void Can_Cancel_Transaction_Before_Selecting_Item()
+    {
+        // Arrange
+        var item = new Item("A1", "Chips", 2.49m, 2);
+        _inventoryManager.AddItem(item);
+
+        var eventArgsList = new List<VendingMachineEventArgs>();
+        _vendingMachine.OnMessageRaised += (_, args) => eventArgsList.Add(args);
+
+        // Act
+        _vendingMachine.CancelTransaction();
+
+        // Assert
+        var transactionCancelledEventArgs = eventArgsList.SingleOrDefault(a => a.GetType() == typeof(TransactionCancelledEventArgs))
+            .As<TransactionCancelledEventArgs>();
+
+        transactionCancelledEventArgs.Should().NotBeNull();
     }
 
     [Fact]
@@ -249,4 +290,54 @@ public class VendingMachineTests
         outOfStockItemEventArgs.Item.Quantity.Should().Be(0);
 
     }
+
+    [Fact]
+    public void Selecting_A_Different_Item_Is_Not_Allowed()
+    {
+        // Arrange
+        var item1 = new Item("A1", "Chips", 2.49m, 3);
+        var item2 = new Item("A2", "Cookies", 0.99m, 2);
+
+        _inventoryManager.AddItems(new[] {item1, item2});
+
+        var eventArgsList = new List<VendingMachineEventArgs>();
+        _vendingMachine.OnMessageRaised += (_, args) => eventArgsList.Add(args);
+
+        // Act
+        _vendingMachine.SelectItem("A1");
+        _vendingMachine.SelectItem("A2");
+        _vendingMachine.InsertCash(5);
+
+        var itemDispensedEventArgs = eventArgsList.Single(a => a.GetType() == typeof(ItemDispensedEventArgs))
+            .As<ItemDispensedEventArgs>();
+
+        itemDispensedEventArgs.Item.ItemId.Should().Be("A1");
+
+    }
+
+    [Fact]
+    public void Selecting_A_Different_Item_After_Cancelling_Is_Allowed()
+    {
+        // Arrange
+        var item1 = new Item("A1", "Chips", 2.49m, 3);
+        var item2 = new Item("A2", "Cookies", 0.99m, 2);
+
+        _inventoryManager.AddItems(new[] { item1, item2 });
+
+        var eventArgsList = new List<VendingMachineEventArgs>();
+        _vendingMachine.OnMessageRaised += (_, args) => eventArgsList.Add(args);
+
+        // Act
+        _vendingMachine.SelectItem("A1");
+        _vendingMachine.CancelTransaction();
+        _vendingMachine.SelectItem("A2");
+        _vendingMachine.InsertCash(5);
+
+        var itemDispensedEventArgs = eventArgsList.Single(a => a.GetType() == typeof(ItemDispensedEventArgs))
+            .As<ItemDispensedEventArgs>();
+
+        itemDispensedEventArgs.Item.ItemId.Should().Be("A2");
+
+    }
+
 }

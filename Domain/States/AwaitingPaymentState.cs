@@ -14,7 +14,7 @@ public sealed class AwaitingPaymentState : IState
     }
     public void SelectItem(Item item)
     {
-        throw new NotSupportedException();
+        _vendingMachine.RaiseEvent(new VendingMachineEventArgs("an item was already selected; if you'd like to select a different item, CANCEL the transaction first."));
     }
 
     public void InsertCash(int amount)

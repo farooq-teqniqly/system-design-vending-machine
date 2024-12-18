@@ -27,13 +27,11 @@ public class Program
         vendingMachine.OnMessageRaised += (_, args) => Console.WriteLine(args.Message);
 
         DisplayCommands();
-        Console.WriteLine(Environment.NewLine);
-
+        
         while (true)
         {
             DisplayAvailableItems(inventoryManager.GetAvailableItems());
-            Console.WriteLine(Environment.NewLine);
-
+            
             Console.WriteLine("enter command: ");
             var input = Console.ReadLine()?.Trim();
 
@@ -81,22 +79,26 @@ public class Program
 
     private static void DisplayCommands()
     {
-        Console.WriteLine("Vending Machine 1.0!");
-        Console.WriteLine("Commands:\n");
-        Console.WriteLine("SELECT <item id>");
-        Console.WriteLine("INSERT <cash denomination>");
-        Console.WriteLine("VIEW");
-        Console.WriteLine("CANCEL");
-        Console.WriteLine("EXIT");
+        Console.WriteLine("Vending Machine Simulator!");
+        Console.WriteLine("Commands:");
+        Console.WriteLine(Environment.NewLine);
+        Console.WriteLine("SELECT <item id> (select a single item for purchase)");
+        Console.WriteLine("INSERT <cash denomination> (insert a single bill)");
+        Console.WriteLine("CANCEL (cancel an in-process transaction)");
+        Console.WriteLine("EXIT (exit the simulator)");
+        Console.WriteLine(Environment.NewLine);
     }
 
     private static void DisplayAvailableItems(IEnumerable<Item> items)
     {
-        Console.WriteLine("Available items:\n");
+        Console.WriteLine("Available items:");
+        Console.WriteLine(Environment.NewLine);
 
         foreach (var item in items)
         {
             Console.WriteLine(item);
         }
+
+        Console.WriteLine(Environment.NewLine);
     }
 }

@@ -19,12 +19,12 @@ public sealed class IdleState : IState
 
     public void InsertCash(int amount)
     {
-        throw new NotSupportedException();
+        _vendingMachine.RaiseEvent(new VendingMachineEventArgs("select an item first"));
     }
 
     public void CancelTransaction()
     {
-        throw new NotSupportedException();
+        _vendingMachine.CurrentState = new IdleState(_vendingMachine);
     }
 
     public void NotifyLowStockItems()
