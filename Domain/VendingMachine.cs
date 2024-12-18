@@ -1,4 +1,5 @@
 using System.IO.Enumeration;
+using Domain.EventArgs;
 using Domain.Inventory;
 using Domain.Money;
 using Domain.States;

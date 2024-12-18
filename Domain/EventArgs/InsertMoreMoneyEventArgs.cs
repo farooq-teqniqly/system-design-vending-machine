@@ -1,4 +1,4 @@
-﻿namespace Domain;
+namespace Domain.EventArgs;
 
 public class InsertMoreMoneyEventArgs : VendingMachineEventArgs
 {

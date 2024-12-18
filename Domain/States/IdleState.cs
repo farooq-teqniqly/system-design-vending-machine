@@ -1,3 +1,4 @@
+using Domain.EventArgs;
 using Domain.Inventory;
 
 namespace Domain.States;

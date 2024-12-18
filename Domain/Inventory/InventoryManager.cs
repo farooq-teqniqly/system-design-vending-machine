@@ -1,5 +1,3 @@
-using Domain.Exceptions;
-
 namespace Domain.Inventory;
 public sealed class InventoryManager : IInventoryManager
 {
@@ -15,7 +13,7 @@ public sealed class InventoryManager : IInventoryManager
     {
         if (!_items.TryAdd(item.ItemId, item))
         {
-            throw new InventoryException($"item already added: {item}");
+            throw new ArgumentException($"item already added: {item}");
         }
     }
 
