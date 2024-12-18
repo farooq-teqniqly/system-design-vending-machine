@@ -337,7 +337,20 @@ public class VendingMachineTests
             .As<ItemDispensedEventArgs>();
 
         itemDispensedEventArgs.Item.ItemId.Should().Be("A2");
+    }
 
+    [Fact]
+    public void Cannot_Insert_Bill_Before_Selecting_An_Item()
+    {
+        var eventArgsList = new List<VendingMachineEventArgs>();
+        _vendingMachine.OnMessageRaised += (_, args) => eventArgsList.Add(args);
+
+        _vendingMachine.InsertCash(5);
+
+        var vendingMachineEventArgs = eventArgsList.Single(a => a.GetType() == typeof(VendingMachineEventArgs))
+            .As<VendingMachineEventArgs>();
+
+        vendingMachineEventArgs.Message.Should().Be("select an item first");
     }
 
 }

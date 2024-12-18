@@ -1,4 +1,3 @@
-using System.IO.Enumeration;
 using Domain.EventArgs;
 using Domain.Inventory;
 using Domain.Money;
@@ -10,7 +9,7 @@ public sealed class VendingMachine
     private readonly IInventoryManager _inventoryManager;
     private readonly IMoneyManager _moneyManager;
 
-    public Item? SelectedItem { get; private set; }
+    public Item SelectedItem { get; private set; }
 
     public event EventHandler<VendingMachineEventArgs>? OnMessageRaised;
 
@@ -21,11 +20,12 @@ public sealed class VendingMachine
         _inventoryManager = inventoryManager;
         _moneyManager = moneyManager;
         CurrentState = new IdleState(this);
+        SelectedItem = new NullItem();
     }
 
     public void SelectItem(string itemId)
     {
-        if (SelectedItem != null)
+        if (SelectedItem is not NullItem)
         {
             RaiseEvent(new ItemAlreadySelectedEventArgs(SelectedItem));
             return;
@@ -77,7 +77,7 @@ public sealed class VendingMachine
             }
         }
 
-        SelectedItem = null;
+        SelectedItem = new NullItem();
     }
 
     public void DispenseChange(int amount)
@@ -102,7 +102,7 @@ public sealed class VendingMachine
     {
         OnMessageRaised?.Invoke(this, new TransactionCancelledEventArgs());
         CurrentState.CancelTransaction();
-        SelectedItem = null;
+        SelectedItem = new NullItem();
     }
 
     public void RaiseEvent(VendingMachineEventArgs args)
