@@ -25,12 +25,12 @@ public class InventoryManagerConfiguration
     /// Initializes a new instance of the <see cref="InventoryManagerConfiguration"/> class with the specified low inventory threshold.
     /// </summary>
     /// <param name="lowInventoryThreshold">
-    /// The threshold value below which inventory is considered low. Must be a non-negative integer.
+    /// The threshold value below which inventory is considered low. Defaults to 2 if not provided. Must be a non-negative integer.
     /// </param>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Thrown when <paramref name="lowInventoryThreshold"/> is negative.
     /// </exception>
-    public InventoryManagerConfiguration(int lowInventoryThreshold)
+    public InventoryManagerConfiguration(int lowInventoryThreshold = 2)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(lowInventoryThreshold);
 
